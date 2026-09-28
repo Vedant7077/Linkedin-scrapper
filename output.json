@@ -1,0 +1,18 @@
+[
+  {
+    "profile_url": "https://www.linkedin.com/in/vedant-palekar21/",
+    "author_name": "Vedant Palekar",
+    "author_headline": "Student at Pillai College of Engineering, Panvel",
+    "author_image": "https://media.licdn.com/dms/image/v2/D4E03AQGGecvA7bGcBw/profile-displayphoto-shrink_400_400/B4EZbIdBYvHwAg-/0/1747119774305?e=1762992000&v=beta&t=MjEMxySWatJjkoKme36SRsyHnUsg9vpAzIGdO_MfBWQ",
+    "author_url": "https://www.linkedin.com/in/vedant-palekar21/",
+    "posts": [
+      {
+        "id": "post-1",
+        "content": "🚀 Excited to Share: VolunTrack – My Latest Flutter App!\nLast to last week, our college hosted HackCelestial 2.0, and I had the opportunity to build an app that truly makes a difference for event volunteers – VolunTrack!\nThe idea was simple: make tracking participant entries (check-ins & check-outs) effortless. While initially designed for event attendance, the app is flexible enough to create and manage events of any kind.\nA huge shoutout to my friend, who played a pivotal role in building the admin dashboard, while I focused on developing the mobile app in Flutter. 💻✨\n🌟 Features of VolunTrack:\nEvent Management – Add & manage multiple events with ease.\nQR Code Generation – Unique codes for each participant.\nQR Scanning – Volunteers can quickly log entries.\nEfficient Workflow – Minimizes manual work & speeds up check-ins.\n📌 Tech Stack: Flutter (Dart) | Node.js | Supabase\n💡 How It Works:\n1️⃣ Create an event\n2️⃣ Generate unique participant QR codes\n3️⃣ Scan QR codes at the venue\n4️⃣ Track all entries seamlessly\nCheck it out here:\nI’m thrilled to see how VolunTrack can help streamline event management and make the volunteer experience smoother! 💪",
+        "media": "https://media.licdn.com/dms/image/v2/D4E03AQGGecvA7bGcBw/profile-displayphoto-shrink_100_100/B4EZbIdBYvHwAU-/0/1747119774281?e=1762992000&v=beta&t=jvJQvXcokvhk-vHy0kMg5Ge9gTJSslJiVnwX0Fe1gjE",
+        "post_url": "https://www.linkedin.com/feed/update/urn:li:activity:7379951663094079488",
+        "timestamp": "2025-10-04T23:40:56.575290"
+      }
+    ]
+  }
+]

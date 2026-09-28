@@ -1,0 +1,21 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Python cache & temp files
+__pycache__/
+*.py[cod]
+*$py.class
+tempCodeRunnerFile.py
+
+# Sensitive cookies and credentials
+linkedin_cookies.json
+linkedin_cookies_new.json
+cookies.pkl
+*.pkl
+.env
+
+# OS files
+.DS_Store
+Thumbs.db

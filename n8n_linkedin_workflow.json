@@ -1,0 +1,522 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "collection": "students",
+        "options": {
+          "limit": 50
+        },
+        "query": "{\n  \"linkedin\": { \"$exists\": true }\n}\n"
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        -2528,
+        16
+      ],
+      "id": "5f809f98-2bd0-4211-b09e-3a79d0c328b0",
+      "name": "Find documents",
+      "credentials": {
+        "mongoDb": {
+          "id": "kezb3sixvmc6hI6t",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6888cc0e-62b3-4b98-a718-c7cd28283d72",
+              "leftValue": "={{ $json.linkedin }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2592,
+        416
+      ],
+      "id": "6527e3fb-7883-49dc-8c43-943898797d7d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "42661712-4a64-465e-bed5-6f27ce0021c1",
+              "name": "linkedin",
+              "value": "={{ $json.linkedin }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2336,
+        400
+      ],
+      "id": "bb5f253c-6067-4ff3-b47a-179d870235bd",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/harvestapi~linkedin-profile-posts/runs",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"maxComments\": 0,\n    \"maxPosts\": 0,\n    \"maxReactions\": 0,\n    \"postedLimit\": \"24h\",\n    \"scrapeComments\": false,\n    \"scrapeReactions\": false,\n    \"targetUrls\": {{ JSON.stringify([...new Set($items().map(i => i.json.linkedin_url))]) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2160,
+        896
+      ],
+      "id": "ce152e4f-2c33-498d-ac93-9c61aea0cb23",
+      "name": "Launched Linkedin Post scrapper actor",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "dvxIa4U1CoAGGqWO",
+          "name": "Apify -3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.apify.com/v2/acts/harvestapi~linkedin-profile-posts/runs/last",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1792,
+        896
+      ],
+      "id": "6026c4fe-0da7-43d1-bfda-613abeb71924",
+      "name": "Check Profile Scrapper Status",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "dvxIa4U1CoAGGqWO",
+          "name": "Apify -3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "15b24bd6-ce93-4ed0-8c95-b8479d7fbe1a",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "SUCCEEDED",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1584,
+        896
+      ],
+      "id": "980cf0e2-f7f4-4f83-b6aa-6f9064e4cb5f",
+      "name": "Is Profile Scrapping Complete?"
+    },
+    {
+      "parameters": {
+        "url": "https://api.apify.com/v2/acts/harvestapi~linkedin-profile-posts/runs/last/dataset/items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1360,
+        880
+      ],
+      "id": "6c0f2da7-ad97-4068-af20-22c5994cfa5b",
+      "name": "Retrieve posts data",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "dvxIa4U1CoAGGqWO",
+          "name": "Apify -3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "blogs",
+        "fields": "=urn,author,text,url,date,status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        -1184,
+        400
+      ],
+      "id": "43573c9d-e983-49a4-9859-e8ae7b1bd49e",
+      "name": "Insert documents",
+      "credentials": {
+        "mongoDb": {
+          "id": "kezb3sixvmc6hI6t",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1968,
+        896
+      ],
+      "id": "93f48b4d-687a-47e9-b72c-9710e14ff2f6",
+      "name": "Wait 5 seconds",
+      "webhookId": "eac7975c-651f-418d-9f4e-0bed30822f3f"
+    },
+    {
+      "parameters": {
+        "jsCode": "const seen = new Set();\n\nreturn items\n  .map(item => {\n    const slug = item.json.linkedin;\n    if (!slug) return null;\n\n    const url = `https://www.linkedin.com/in/${slug}/`;\n\n    // Only return if not already seen\n    if (!seen.has(url)) {\n      seen.add(url);\n      return { json: { linkedin_url: url } };\n    }\n    return null; // skip duplicates\n  })\n  .filter(Boolean); // remove nulls\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2128,
+        400
+      ],
+      "id": "69e47f31-94ca-48ea-ada5-85ce186a9b6e",
+      "name": "converting usernames to linkedin urls"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "56e1516b-9366-43c9-8b93-7ed4645292f5",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "02415136-101c-4539-b3cb-0414948084de",
+              "name": "type",
+              "value": "={{ $json.type }}",
+              "type": "string"
+            },
+            {
+              "id": "a908f6d0-1550-4df9-842f-39253fa2558f",
+              "name": "linkedinPostUrl",
+              "value": "={{ $json.linkedinUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "0d20cda7-1840-4718-9151-408806722450",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "4dbb10c5-bd6f-48a3-b908-ee716770a6eb",
+              "name": "author.name",
+              "value": "={{ $json.author.name }}",
+              "type": "string"
+            },
+            {
+              "id": "bb3e2f9b-243e-4182-aa87-f5c5a227439e",
+              "name": "author.avatar.url",
+              "value": "={{ $json.author.avatar.url }}",
+              "type": "string"
+            },
+            {
+              "id": "d320b70a-7429-48d5-b053-43a026ce8cd5",
+              "name": "postImages",
+              "value": "={{ $json.postImages}}",
+              "type": "array"
+            },
+            {
+              "id": "b6ba9730-4987-43bf-8cbb-4e448afc1711",
+              "name": "postVideo",
+              "value": "={{ $json.postVideo || null }}\n",
+              "type": "string"
+            },
+            {
+              "id": "5b42bbbe-dcbc-4792-8b5f-6341d4105f8f",
+              "name": "status",
+              "value": "pending",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1360,
+        400
+      ],
+      "id": "5f0e55d4-b791-409e-9892-630fe57eb3a9",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2720,
+        16
+      ],
+      "id": "3e8f5ffb-f644-4c35-8586-975c701a90e1",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "# 🚀 Scheduled Trigger & Find Documents\n\n* Workflow runs automatically at a specific time (e.g., every day at 10 AM).\n* Fetches all students from MongoDB students collection.\n* Ensures only records with a LinkedIn field are retrieved.",
+        "height": 400,
+        "width": 480
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2768,
+        -240
+      ],
+      "typeVersion": 1,
+      "id": "07ab29d7-a632-410c-9b31-aa517ccfb506",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# 📌 Filtering & Preparing URLs\n\n* If node checks LinkedIn field is not empty.\n* Edit Fields keeps only LinkedIn usernames.\n* Code node converts usernames into full LinkedIn profile URLs and removes duplicates.\n",
+        "height": 352,
+        "width": 720,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2640,
+        224
+      ],
+      "typeVersion": 1,
+      "id": "8abcbfff-9a49-4e0b-9ae1-67ecd882f9fa",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# ✅ Data Cleaning & Storage\n\n* Edit Fields node reshapes the scraped data into structured fields (id, content, author, postImages, postVideo).\n* Adds a default field status: \"pending\" for admin tracking.\n* Insert documents node stores the posts into MongoDB blogs collection.\n",
+        "height": 384,
+        "width": 608,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1472,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "4ff55972-13d9-4465-af97-71f479e51eec",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# 🕒 Scraping Latest Posts\n\n* Apify actor launched to scrape LinkedIn profile posts.\n* Configured with postedLimit: \"24h\" → retrieves only posts from the past 24 hours.\n* Wait node adds delay while actor runs.\n* Check status loops until scraping is finished, then Retrieve posts data pulls results.",
+        "height": 448,
+        "width": 1008,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2208,
+        688
+      ],
+      "typeVersion": 1,
+      "id": "596c5ca0-7bb5-48da-9124-f40c571f3d68",
+      "name": "Sticky Note3"
+    }
+  ],
+  "connections": {
+    "Find documents": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "converting usernames to linkedin urls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Launched Linkedin Post scrapper actor": {
+      "main": [
+        [
+          {
+            "node": "Wait 5 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Profile Scrapper Status": {
+      "main": [
+        [
+          {
+            "node": "Is Profile Scrapping Complete?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Profile Scrapping Complete?": {
+      "main": [
+        [
+          {
+            "node": "Retrieve posts data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 5 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve posts data": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 5 seconds": {
+      "main": [
+        [
+          {
+            "node": "Check Profile Scrapper Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "converting usernames to linkedin urls": {
+      "main": [
+        [
+          {
+            "node": "Launched Linkedin Post scrapper actor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Insert documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Find documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "a7a256c914deee4b39eda418326dcb432c1abd5efd16de4bdcefc26e4f122c7c"
+  }
+}
